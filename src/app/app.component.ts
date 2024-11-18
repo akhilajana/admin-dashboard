@@ -3,7 +3,7 @@ import { SystemHealth } from './interface/system-health';
 import { SystemCpu } from './interface/system-cpu';
 import { DashboardService } from './service/dashboard.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import * as Chart from 'chart.js';
+import { Chart } from 'chart.js/auto';
 import { ChartType } from './enum/chart-type';
 
 @Component({
@@ -14,15 +14,15 @@ import { ChartType } from './enum/chart-type';
 export class AppComponent implements OnInit{
   public traceList: any[] = [];
   public selectedTrace: any;
-  public systemHealth: SystemHealth;
-  public systemCpu: SystemCpu;
+  public systemHealth: SystemHealth | undefined;
+  public systemCpu: SystemCpu | undefined;
   public processUpTime!: string;
   public http200Traces: any[] = [];
   public http400Traces: any[] = [];
   public http404Traces: any[] = [];
   public http500Traces: any[] = [];
   public httpDefaultTraces: any[] = [];
-  public timestamp: number;
+  public timestamp: number = 0;
   public pageSize = 10;
   public page = 1;
 
@@ -38,17 +38,18 @@ export class AppComponent implements OnInit{
   }
 
   private getTraces(): void {
-    this.dashboardService.getHttpTraces().subscribe(
-      (response:any) => {
+    this.dashboardService.getHttpTraces().subscribe({
+      next: (response:any) => {
         console.log(response);
         this.processTraces(response);
         this.initializeBarChart();
         this.initializePieChart();
       },
-      (error: HttpErrorResponse) => {
+      error: (error: HttpErrorResponse) => {
         alert(error.message);
-      }
-    );
+      },
+      complete: () => console.log('Complete')
+    })
   }
 
   private getCpuUsage(): void {
@@ -105,7 +106,6 @@ export class AppComponent implements OnInit{
   }
   
   private processTraces(traces: any): void {
-   // throw new Error('Method not implemented.');
    this.traceList = traces;
    this.traceList.forEach(trace => {
     switch(trace.response.status) {
@@ -128,8 +128,8 @@ export class AppComponent implements OnInit{
    })
   }
 
-  private initializeBarChart() : void {
-    const barChartElement = document.getElementById('barChart');
+  private initializeBarChart() : Chart {
+    const barChartElement = document.getElementById('barChart') as HTMLCanvasElement;
     return new Chart(barChartElement, {
       type: ChartType.BAR,
       data: {
@@ -138,20 +138,21 @@ export class AppComponent implements OnInit{
         backgroundColor: ['rgb(40, 167, 69)','rgb(0,123,255)','rgb(253,126,20)','rgb(220,53,69)'],
         borderColor: ['rgb(40, 167, 69)','rgb(0,123,255)','rgb(253,126,20)','rgb(220,53,69)'],
         borderWidth: 3
-      }],
+      }]},
       options: {
-        title: { display: true, text: [`Last 100 Requests as of ${new Date()}`]},
-        legend: {display: false},
+        plugins: {
+          title: { display: true, text: [`Last 100 Requests as of ${new Date()}`]},
+          legend: {display: false}
+        },
         scales: {
-          yAxes: [{ticks: {beginAtZero: true}}]
+          y: {beginAtZero: true}
         }
       } 
-    }
-  });
+    })
 }
 
-private initializePieChart() : void {
-  const pieChartElement = document.getElementById('pieChart');
+private initializePieChart() : any {
+  const pieChartElement = document.getElementById('pieChart') as HTMLCanvasElement;
   return new Chart(pieChartElement, {
     type: ChartType.PIE,
     data: {
@@ -160,14 +161,16 @@ private initializePieChart() : void {
       backgroundColor: ['rgb(40, 167, 69)','rgb(0,123,255)','rgb(253,126,20)','rgb(220,53,69)'],
       borderColor: ['rgb(40, 167, 69)','rgb(0,123,255)','rgb(253,126,20)','rgb(220,53,69)'],
       borderWidth: 3
-    }],
+    }]
+  },
     options: {
+      plugins: {
       title: { display: true, text: [`Last 100 Requests as of ${new Date()}`]},
-      legend: {display: true},
-      display: true
+      legend: {display: true}
+    }
+      //display: true
     } 
-  }
-});
+  })
 }
 
 public exportTableToExcel() : void {
@@ -222,7 +225,7 @@ public exportTableToExcel() : void {
     if(mm < 10) {
       
     }
-
+    return "";
   }
 
 }
