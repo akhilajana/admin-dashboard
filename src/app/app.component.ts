@@ -15,7 +15,7 @@ export class AppComponent implements OnInit{
   public traceList: any[] = [];
   public selectedTrace: any;
   public systemHealth: SystemHealth | undefined;
-  public systemCpu: SystemCpu | undefined;
+  public systemCpu: SystemCpu;
   public processUpTime!: string;
   public http200Traces: any[] = [];
   public http400Traces: any[] = [];
@@ -27,8 +27,15 @@ export class AppComponent implements OnInit{
   public page = 1;
 
   constructor(private dashboardService:DashboardService){
-
+    this.systemCpu = { 
+      name: "string",
+      description: "string",
+      baseUnit: 0,
+      measurments:[{statistic:"s", value: 0}],
+      availableTags: []
+    }
   }
+
   ngOnInit(): void {
     this.getTraces();
     this.getCpuUsage();

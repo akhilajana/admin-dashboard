@@ -8,8 +8,8 @@
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
         <span><i class="fa fa-server"></i> System: {{systemHealth?.status}}</span>&nbsp;&nbsp;
-        <span><i class="fa fa-database"></i> DB: {{systemHealth?.details.db.details.database}} - {{systemHealth?.details.db.status}}</span>&nbsp;&nbsp;
-        <span><i class="fa fa-hdd-o"></i> Disk Space: {{systemHealth?.details.diskSpace.details.free}}</span>&nbsp;&nbsp;
+        <span><i class="fa fa-database"></i> DB: {{systemHealth?.details?.db?.details?.database}} - {{systemHealth?.details?.db?.status}}</span>&nbsp;&nbsp;
+        <span><i class="fa fa-hdd-o"></i> Disk Space: {{systemHealth?.details?.diskSpace?.details?.free}}</span>&nbsp;&nbsp;
         <span [ngClass]="{'text-danger': systemCpu.measurments[0].value < 2}"><i class="fa fa-microchip"></i> Processors: {{systemCpu.measurments[0].value}}</span>&nbsp;&nbsp;
         <span><i class="fa fa-clock-o"></i> Up Time: {{processUpTime}}</span>&nbsp;&nbsp;
       </li>
@@ -107,7 +107,7 @@
               </tr>
             </tbody>
           </table>
-          <pagination-controls class="text-center" id="trace-List" (pageChange)="page = $event" maxSize="10" directionLinks="true"></pagination-controls>
+          <pagination-controls class="text-center" id="trace-List" (pageChange)="page = $event" [maxSize]="10" [directionLinks]="true"></pagination-controls>
         </div>
 	</div>
   
